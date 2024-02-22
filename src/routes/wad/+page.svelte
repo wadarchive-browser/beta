@@ -197,12 +197,13 @@
         title={wad.title}
         titleTemplate="%s - Wad Archive"
         description={wad.formattedDescription}
+        canonical="https://wadarchive-browser.github.io/wad?id={wadId}"
         openGraph={{
             type: 'website',
             title: `${wad.title} - Wad Archive`,
             description: wad.formattedDescription,
             images: [...wad.ogImages()],
-            site_name: 'Wad Archive Mirror'
+            siteName: 'Wad Archive Mirror'
         }}
         twitter={{
             cardType: 'summary_large_image',
