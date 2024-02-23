@@ -90,6 +90,9 @@
     .automapimage,
     .endoomimage {
         max-width: 100%;
+        background: #222222;
+        aspect-ratio: 4 / 3;
+        display: inline-block;
     }
 
     .endoomtext {

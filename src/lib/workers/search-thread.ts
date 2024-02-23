@@ -1,115 +1,106 @@
 import { WadFuzzy } from '../util/msgpack-models';
 
-import MiniSearch, { type AsPlainObject } from 'minisearch';
-
 import { fetchAndParseZstd } from '../util/wad-lookup';
 import { base } from '$app/paths';
-import { openDB, type DBSchema } from 'idb';
 import { expose } from 'comlink';
 
-interface SearchDB extends DBSchema {
-    CachedData: {
-        key: string;
-        value: [WadFuzzy[], AsPlainObject];
-    }
-}
+import uFuzzy from '@leeoniya/ufuzzy';
 
-const dbPromise = openDB<SearchDB>(`WadSearch${base}`, 1, {
-    upgrade(database, oldVersion, newVersion, _transaction, _event) {
-        if (database.objectStoreNames.contains('CachedData'))
-            database.deleteObjectStore('CachedData');
-
-        database.createObjectStore('CachedData');
-    },
-});
+const empty: readonly [] = [];
 
 class SearchEngine {
-
-    constructor (
-        private readonly haystack: MiniSearch,
+    constructor(
+        private readonly uf: uFuzzy,
         private readonly wadsFuzzy: WadFuzzy[],
-    ) {
-    }
+        private readonly haystack: string[],
+    ) { }
 
     static async create() {
-        const opts = {
-            idField: 'realId',
-            fields: ['Id', 'Md5', 'Sha256', 'Names', 'Filenames'], // fields to index for full-text search
-            storeFields: undefined
-        };
+        console.time('Loading wadsFuzzy');
+        const wadsFuzzy = (await fetchAndParseZstd(`${base}/wadsFuzzy.msg.zstd`, true) as unknown[][])
+            .map(e => new WadFuzzy(e));
+        console.timeEnd('Loading wadsFuzzy');
 
-        let wadsFuzzy: WadFuzzy[] | undefined = undefined;
-        let search: MiniSearch | undefined = undefined;
-        const db = await dbPromise;
-        if (db) {
-            const cached = await db.get('CachedData', 'SearchEngine');
-            if (cached) {
-                console.time('Loading wadsFuzzy from cache');
-                wadsFuzzy = cached[0];
-                search = MiniSearch.loadJS(cached[1], opts);
-                console.timeEnd('Loading wadsFuzzy from cache');
-            }
-        }
-
-        if (!search || !wadsFuzzy) {
-            console.time('Loading wadsFuzzy');
-            wadsFuzzy = (await fetchAndParseZstd(`${base}/wadsFuzzy.msg.zstd`, false) as unknown[][])
-                .map(e => new WadFuzzy(e));
-            console.timeEnd('Loading wadsFuzzy');
-
-            console.time('Building search table');
-            search = new MiniSearch(opts);
-            search.addAll(wadsFuzzy.map((e, i) => ({...e, realId: i})));
-            console.timeEnd('Building search table');
-
-            if (db) {
-                await db.add('CachedData', [wadsFuzzy, search.toJSON()], 'SearchEngine');
-            }
-        }
-
-        return new SearchEngine(search, wadsFuzzy);
+        return new SearchEngine(
+            new uFuzzy({
+                intraMode: 1,
+                intraChars: '[a-z\\d\'\\.]'
+            }),
+            wadsFuzzy,
+            wadsFuzzy.map(e => `${e.Id} ${e.Md5} ${e.Sha256} ${e.Names.join(' ')} ${e.Filenames.join(' ')}`)
+        );
     }
 
-    searchWads(searchQuery: string) {
-        const results = this.haystack.search(searchQuery);
+    searchWads(searchQuery: string, limit: number): {
+        readonly count: number;
+        readonly results: readonly WadFuzzy[];
+    } {
+        // pre-filter
+        const idxs = this.uf.filter(this.haystack, searchQuery);
 
         // eslint-disable-next-line @typescript-eslint/no-this-alias
-        const self = this;
-        return {
-            count: results.length,
-            filteredOrderedCount: results.length,
-            *get() {
-                for (let i = 0; i < results.length; i++) {
-                    yield self.wadsFuzzy[results[i].id as number];
-                }
+        const wadsFuzzy = this.wadsFuzzy;
+
+        // idxs can be null when the needle is non-searchable (has no alpha-numeric chars)
+        if (idxs != null && idxs.length > 0) {
+            // sort/rank only when <= 10,000 items
+            const infoThresh = 1e4;
+
+            if (idxs.length <= infoThresh) {
+                const info = this.uf.info(idxs, this.haystack, searchQuery);
+
+                // order is a double-indirection array (a re-order of the passed-in idxs)
+                // this allows corresponding info to be grabbed directly by idx, if needed
+                const order = this.uf.sort(info, this.haystack, searchQuery);
+
+                // render post-filtered & ordered matches
+                return {
+                    count: order.length,
+                    results: [...(function*() {
+                        const actualLimit = Math.min(order.length, limit);
+                        for (let i = 0; i < actualLimit; i++) {
+                            // using info.idx here instead of idxs because uf.info() may have
+                            // further reduced the initial idxs based on prefix/suffix rules
+                            yield wadsFuzzy[info.idx[order[i]]];
+                        }
+                    })()]
+                };
+            } else {
+                // render pre-filtered but unordered matches
+                return {
+                    count: idxs.length,
+                    results: [...(function*() {
+                        const actualLimit = Math.min(idxs.length, limit);
+                        for (let i = 0; i < actualLimit; i++) {
+                            yield wadsFuzzy[idxs[i]];
+                        }
+                    })()]
+                };
             }
-        };
+        } else {
+            return {
+                count: 0,
+                results: empty
+            };
+        }
     }
 }
 
 let searchData: SearchEngine | undefined;
 
 export interface SearchResult {
-    count: number;
-    results: WadFuzzy[];
-}
-
-function *limitIterable<T>(iterable: Iterable<T>, limit: number) {
-    let index = 0;
-    for (const item of iterable) {
-        if (index++ >= limit) return;
-        yield item;
-    }
+    readonly count: number;
+    readonly results: readonly WadFuzzy[];
 }
 
 expose({
     async searchWads(searchQuery: string, limit = 1000): Promise<SearchResult> {
         searchData ??= await SearchEngine.create();
 
-        const results = searchData.searchWads(searchQuery);
+        const results = searchData.searchWads(searchQuery, limit);
         return {
             count: results.count,
-            results: [...limitIterable(results.get(), limit)]
+            results: results.results
         };
     }
 });

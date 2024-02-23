@@ -43,14 +43,17 @@
 		"@hpcc-js/wasm": "^2.16.0",
 		"@js-temporal/polyfill": "^0.4.4",
 		"@msgpack/msgpack": "^3.0.0-beta2",
+		"@orama/orama": "^2.0.8",
 		"@sveltejs/vite-plugin-svelte": "^3.0.2",
 		"@sveltestrap/sveltestrap": "^6.2.5",
 		"comlink": "^4.4.1",
 		"fflate": "^0.8.2",
+		"flexsearch": "github:nextapps-de/flexsearch",
 		"idb": "^8.0.0",
 		"idb-lru-cache": "^1.0.0",
 		"minisearch": "^6.3.0",
 		"msgpack-lite": "^0.1.26",
+		"slimsearch": "^2.1.1",
 		"svelte-icons": "^2.1.0",
 		"zstandard-wasm": "1.5.0-rev.5"
 	}
