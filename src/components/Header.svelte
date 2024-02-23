@@ -49,7 +49,7 @@
             <NavLink href="{base}/">Home</NavLink>
         </NavItem>
         <NavItem>
-            <NavLink href="{base}/index">WAD Index</NavLink>
+            <NavLink href="{base}/wad-index">WAD Index</NavLink>
         </NavItem>
         <NavItem>
             <Form on:submit={e => (e.preventDefault(), goto(`${base}/search?` + new URLSearchParams({q: searchTerm})))} inline>

@@ -34,6 +34,6 @@
 
 <span style="word-wrap: break-word;">
 {#each initials as initial}
-    <a class="cum" href="{base}/index/{initial === '#' ? 'digit' : initial}">{initial.toUpperCase()}</a>
+    <a class="cum" href="{base}/wad-index/{initial === '#' ? 'digit' : initial}">{initial.toUpperCase()}</a>
 {/each}
 </span>
