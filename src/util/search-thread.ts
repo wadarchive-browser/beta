@@ -3,8 +3,7 @@ import { WadFuzzy } from './msgpack-models';
 import MiniSearch, { type AsPlainObject } from 'minisearch';
 
 import { fetchAndParseZstd } from './wad-lookup';
-import { base } from '$app/paths';
-import { openDB, type DBSchema } from 'idb';
+import { openDB, type DBSchema, type IDBPDatabase } from 'idb';
 import { expose } from 'comlink';
 
 interface SearchDB extends DBSchema {
@@ -14,14 +13,8 @@ interface SearchDB extends DBSchema {
     }
 }
 
-const dbPromise = openDB<SearchDB>(`WadSearch${base}`, 1, {
-    upgrade(database, oldVersion, newVersion, _transaction, _event) {
-        if (database.objectStoreNames.contains('CachedData'))
-            database.deleteObjectStore('CachedData');
-
-        database.createObjectStore('CachedData');
-    },
-});
+let base: string | undefined = undefined;
+let dbPromise: Promise<IDBPDatabase<SearchDB>> | undefined = undefined;
 
 class SearchEngine {
 
@@ -103,7 +96,17 @@ function *limitIterable<T>(iterable: Iterable<T>, limit: number) {
 }
 
 expose({
-    async searchWads(searchQuery: string, limit = 1000): Promise<SearchResult> {
+    async searchWads(base1: string, searchQuery: string, limit = 1000): Promise<SearchResult> {
+        base ??= base1;
+        dbPromise ??= openDB<SearchDB>(`WadSearch${base}`, 1, {
+            upgrade(database) {
+                if (database.objectStoreNames.contains('CachedData'))
+                    database.deleteObjectStore('CachedData');
+
+                database.createObjectStore('CachedData');
+            },
+        });
+
         searchData ??= await SearchEngine.create();
 
         const results = searchData.searchWads(searchQuery);
