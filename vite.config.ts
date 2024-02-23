@@ -7,7 +7,7 @@ export default defineConfig({
         noExternal: ['@popperjs/core']
     },
     worker: {
-		// plugins: () => [sveltekit()],
+		plugins: () => [sveltekit()],
         format: 'es'
     },
     build: {
