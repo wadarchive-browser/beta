@@ -4,22 +4,10 @@ import { browser } from '$app/environment';
 import { wrap } from 'comlink';
 import { base } from '$app/paths';
 
-const dbPromise = browser ? openDB('WadCache', 4, {
+const dbPromise = browser ? openDB('WadCache', 5, {
     upgrade(database, oldVersion, newVersion, _transaction, _event) {
-        const migrations: [...[oldVersion: number, newVersion: number][], upgradeFunc: () => void][] = [
-            [[1, 2], [2, 3], [3, 4], () => database.deleteObjectStore('CachedData')]
-        ];
-
-        for (const migration of migrations) {
-            const upgradeFunc = migration[migration.length - 1] as (() => void);
-            for (let i = 0; i < migration.length - 1; i++) {
-                const [oldVersion1, newVersion1] = migration[i] as [oldVersion: number, newVersion: number];
-                if (oldVersion === oldVersion1 && newVersion! <= newVersion1) {
-                    oldVersion = newVersion!;
-                    upgradeFunc();
-                }
-            }
-        }
+        if (database.objectStoreNames.contains('CachedData'))
+            database.deleteObjectStore('CachedData');
 
         database.createObjectStore('CachedData');
     },
