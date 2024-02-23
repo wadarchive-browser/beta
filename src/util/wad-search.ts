@@ -10,6 +10,10 @@ export class WadFuzzy extends MessagePackObject {
     @key(2) @type(HexConverter) readonly Sha256!: string;
     @key(3) readonly Names!: string[];
     @key(4) readonly Filenames!: string[];
+
+    get IdSmall() {
+        return this.Id.slice(0, 9);
+    }
 }
 
 class SearchEngine {

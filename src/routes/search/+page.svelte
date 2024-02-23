@@ -86,7 +86,7 @@
         Not what you were looking for? Try <a href="/googlesearch?q={encodeURIComponent(results.query)}">searching with Google</a>
     </p>
     {#each results.results as result}
-        <a href="/wad?id={result.Id}" class="resultlink">
+        <a href="/wad?id={result.IdSmall}" class="resultlink">
             <Card class="mb-3">
                 <CardHeader>
                     {#if result.Names[0]}
@@ -104,7 +104,8 @@
                         Alternative file names:
                         {#each result.Filenames.slice(1) as filename, i}{i != 0 ? ";" : ""} <code>{filename}</code>{/each}<br>
                         {/if}
-                        ID / SHA-1: <code>{result.Id}</code><br>
+                        ID: <code>{result.IdSmall}</code><br>
+                        SHA-1: <code>{result.Id}</code><br>
                         {#if result.Md5}
                         MD5: <code>{result.Md5}</code><br>
                         {/if}

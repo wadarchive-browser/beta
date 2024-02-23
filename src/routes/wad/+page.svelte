@@ -5,7 +5,7 @@
     import type { PageData } from "./$types";
     import MapComponent from "../../components/MapComponent.svelte";
     import type { Endoom, Map, NiceNames, Wad, WadLumps, WadType } from "../../util/msgpack-models";
-    import { queryLumpList, queryWad } from "../../util/wad-lookup";
+    import { queryLumpList, queryWad, queryWadByName } from "../../util/wad-lookup";
     import details from "$lib/images/details.png";
     import { aAn, escapeHTML, humanizeFileSize, trimToLength } from "../../util";
     import { redirect } from '@sveltejs/kit';
@@ -13,6 +13,9 @@
     import { never } from '../../util/promise';
     import MetaTags from 'svelte-meta-tags/MetaTags.svelte';
     import { Jumper } from "../../components/spinners";
+    import { goto } from '$app/navigation';
+
+    const base = 'https://wadarchive-browser.github.io';
 
     let modalEndoom: [endoom: Endoom, mode: "text" | "image"] | undefined;
 
@@ -32,27 +35,32 @@
 
     let wadLumps: WadLumps | undefined;
 
-    let wadId: string | undefined;
-
     let theErr: unknown | undefined;
     let loadLumpsErr: unknown | undefined;
     let loadingLumps = false;
 
     onMount(() => {
-        wadId = $page.url.searchParams.get('id') ?? undefined;
+        let wadId = $page.url.searchParams.get('id');
+        const wadName = $page.url.searchParams.get('name');
 
-        if (!$page.url.searchParams.has('id')) {
+        if (wadId && wadId.length > 9) {
+            wadId = wadId.slice(0, 9);
+        }
+
+        if (!wadId && !wadName) {
             throw redirect(300, '/');
         }
 
         (async () => {
-            const wad1 = await queryWad(wadId!);
+            const wad1 = wadId ? await queryWad(wadId) : await queryWadByName(wadName!);
 
             const title = wad1.Name
                 ?? wad1.FallbackNames[0]
+                ?? wad1.CanonicalFilename
                 ?? wad1.Filename
                 ?? wad1.Readmes.map(e => e.match(/^\btitle[ \t]*:[ \t]*(.*)$/im)?.[1]?.trim()).find(e => e != null)
-                ?? wad1.FallbackFilenames[0];
+                ?? wad1.FallbackFilenames[0]
+                ?? wad1.IdSmall;
 
             let mainScreenshot: string | null = null;
 
@@ -67,7 +75,7 @@
             if (wad1.Description ?? wad1.FallbackDescriptions?.[0]) {
                 formattedDescription = wad1.Description ?? wad1.FallbackDescriptions?.[0]!;
             } else {
-                formattedDescription = wad1.Filename ?? wad1.FallbackFilenames[0];
+                formattedDescription = wad1.Filename ?? wad1.FallbackFilenames[0] ?? wad1.IdSmall;
                 if (wad1.Name ?? wad1.FallbackNames[0]) {
                     formattedDescription += ` (${wad1.Name ?? wad1.FallbackNames[0]})`;
                 }
@@ -106,6 +114,20 @@
                     }
                 }
             };
+
+            const params = $page.url.searchParams;
+            if (params.has('id')) {
+                if (wad1.CanonicalFilename) {
+                    params.delete('id');
+                    params.set('name', wad1.CanonicalFilename);
+
+                    goto('?' + params, { replaceState: true });
+                } else if (params.get('id')!.length > 9) {
+                    params.set('id', wad1.IdSmall);
+
+                    goto('?' + params, { replaceState: true });
+                }
+            }
         })().catch(err => {
             theErr = err;
         });
@@ -197,7 +219,7 @@
         title={wad.title}
         titleTemplate="%s - Wad Archive"
         description={wad.formattedDescription}
-        canonical="https://wadarchive-browser.github.io/wad?id={wadId}"
+        canonical={wad.CanonicalFilename ? `${base}/wad?name=${wad.CanonicalFilename}` : `${base}/wad?id=${wad.IdSmall}`}
         openGraph={{
             type: 'website',
             title: `${wad.title} - Wad Archive`,

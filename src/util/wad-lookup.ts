@@ -1,16 +1,29 @@
-import { Wad, WadLumps } from './msgpack-models';
+import { Wad, WadLumps, convertUint8ArrayToHex } from './msgpack-models';
 import { openDB } from 'idb';
 import { browser } from '$app/environment';
 import { wrap } from 'comlink';
 
-const dbPromise = browser ? openDB('WadCache', 2, {
-    upgrade(database, oldVersion, newVersion, transaction, event) {
-        if (oldVersion === 1 && newVersion === 2) {
-            database.deleteObjectStore('CachedData');
+const dbPromise = browser ? openDB('WadCache', 4, {
+    upgrade(database, oldVersion, newVersion, _transaction, _event) {
+        const migrations: [...[oldVersion: number, newVersion: number][], upgradeFunc: () => void][] = [
+            [[1, 2], [2, 3], [3, 4], () => database.deleteObjectStore('CachedData')]
+        ];
+
+        for (const migration of migrations) {
+            const upgradeFunc = migration[migration.length - 1] as (() => void);
+            for (let i = 0; i < migration.length - 1; i++) {
+                const [oldVersion1, newVersion1] = migration[i] as [oldVersion: number, newVersion: number];
+                if (oldVersion === oldVersion1 && newVersion! <= newVersion1) {
+                    oldVersion = newVersion!;
+                    upgradeFunc();
+                }
+            }
         }
+
         database.createObjectStore('CachedData');
     },
 }) : undefined;
+
 const workerPromise = browser ? (async () => {
     // https://medium.com/geekculture/sveltekit-web-worker-8cfc0c86abf6
     const { default: ZstdWorker } = await import('./zstd-thread?worker');
@@ -57,4 +70,10 @@ export async function queryLumpList(wad: Wad): Promise<WadLumps | undefined> {
         return new WadLumps(decodedMessage[wad.Id]);
 
     return undefined;
+}
+
+export async function queryWadByName(name: string): Promise<Wad> {
+    const decodedMessage = await fetchAndParseZstd('/wadsByName.msg.zstd') as Record<string, string>;
+
+    return await queryWad(decodedMessage[name]);
 }

@@ -34,15 +34,22 @@ const sms = new SitemapAndIndexStream({
 
 (async () => {
     const allWadIds = createInterface({
-        input: createReadStream(resolve(staticRoot, 'allWadIds.txt'))
+        input: createReadStream(resolve(staticRoot, 'allWadNames.txt'))
     });
 
-    for await (const wadId of allWadIds) {
+    for await (const line of allWadIds) {
         // console.log(line);
-        sms.write({
-            url: new URL(`wad?id=${wadId}`, pathRoot).toString(),
-            changefreq: EnumChangefreq.YEARLY
-        } satisfies SitemapItemLoose);
+        if (line.startsWith('name:')) {
+            sms.write({
+                url: new URL(`wad?name=${line.slice('name:'.length)}`, pathRoot).toString(),
+                changefreq: EnumChangefreq.YEARLY
+            } satisfies SitemapItemLoose);
+        } else {
+            sms.write({
+                url: new URL(`wad?id=${line.slice('id:'.length)}`, pathRoot).toString(),
+                changefreq: EnumChangefreq.YEARLY
+            } satisfies SitemapItemLoose);
+        }
     }
 
     sms.end(); // necessary to let it know you've got nothing else to write

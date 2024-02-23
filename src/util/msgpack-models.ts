@@ -5,6 +5,9 @@ export const HexConverter = new CustomConverter<Uint8Array, string>(convertUint8
 export type EncodedDate = [unixTimeSeconds: number, offsetMinutes: number];
 const DateConverter = new CustomConverter<EncodedDate, Date>(([unixTimeSeconds, offsetMinutes]) => new Date((unixTimeSeconds * 1000) + (offsetMinutes * 60 * 1000)));
 
+type long = bigint;
+type bool = boolean;
+
 export class Graphic extends MessagePackObject {
     @key(0) readonly Name!: string;
     @key(1) readonly Image!: string;
@@ -34,14 +37,11 @@ export class Map extends MessagePackObject {
     @key(8) readonly DeathmatchSpawns!: number;
     @key(9) readonly SingeplayerSpawns!: number;
     @key(10) readonly CoopSpawns!: number;
-    @key(11) readonly Corrupt!: boolean;
+    @key(11) readonly Corrupt!: bool;
     @key(12) readonly CorruptMessage!: string | null;
-    @key(13) readonly HasAutomapImage!: boolean;
+    @key(13) readonly HasAutomapImage!: bool;
     @key(14) readonly Screenshot!: string | null;
 }
-
-type long = bigint;
-type bool = boolean;
 
 export class Wad extends MessagePackObject {
     @key(0) @type(HexConverter) readonly Id!: string;
@@ -78,14 +78,16 @@ export class Wad extends MessagePackObject {
     @key(31) @type(array(Endoom)) readonly Endooms!: Endoom[];
     @key(32) @type(array(Map)) readonly Maps!: Map[];
     @key(33) readonly LumpsInfoIndex!: [number, number] | null;
+    @key(34) readonly CanonicalFilename!: string;
+    @key(35) readonly IdSmall!: string;
 }
 
 export class Lump extends MessagePackObject {
     @key(0) readonly Name!: string;
     @key(1) readonly Size!: number;
     @key(2) readonly Type!: number;
-    @key(3) readonly Corrupt!: boolean;
-    @key(4) readonly Compressed!: boolean;
+    @key(3) readonly Corrupt!: bool;
+    @key(4) readonly Compressed!: bool;
     @key(5) @type(HexConverter) readonly Sha1!: string;
     @key(6) @type(HexConverter) readonly Md5!: string;
     @key(7) @type(HexConverter) readonly Sha256!: string;
