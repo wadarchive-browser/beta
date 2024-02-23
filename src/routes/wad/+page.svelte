@@ -21,7 +21,9 @@
 
     let modalMap: Map | undefined;
 
-    let wad: Wad;
+    let wad: Wad & {
+        formattedDescription: string
+    };
 
     let wadLumps: WadLumps | undefined;
 
@@ -44,45 +46,12 @@
         (async () => {
             const wad1 = wadId ? await queryWad(wadId) : await queryWadByName(wadName!);
 
-            const title = wad1.Name
-                ?? wad1.FallbackNames[0]
-                ?? wad1.CanonicalFilename
-                ?? wad1.Filename
-                ?? wad1.Readmes.map(e => e.match(/^\btitle[ \t]*:[ \t]*(.*)$/im)?.[1]?.trim()).find(e => e != null)
-                ?? wad1.FallbackFilenames[0]
-                ?? wad1.IdSmall;
+            const formattedDescription = trimToLength(500, wad1.FormattedDescription);
 
-            let mainScreenshot: string | null = null;
+            Object.assign(wad1, {formattedDescription});
 
-            const titlepic = wad1.Graphics.find(e => e.Name == "TITLE");
-            if (titlepic) mainScreenshot = formatGraphicPath(wad1, titlepic);
-            else if (wad1.Maps[0]?.Screenshot) mainScreenshot = formatMapScreenshot(wad1, wad1.Maps[0]);
-            else if (wad1.Graphics.length > 0) mainScreenshot = formatGraphicPath(wad1, wad1.Graphics[0]);
-
-            if (mainScreenshot != null) mainScreenshot = getCdnUrl(mainScreenshot);
-
-            let formattedDescription: string;
-            if (wad1.Description ?? wad1.FallbackDescriptions?.[0]) {
-                formattedDescription = wad1.Description ?? wad1.FallbackDescriptions?.[0]!;
-            } else {
-                formattedDescription = wad1.Filename ?? wad1.FallbackFilenames[0] ?? wad1.IdSmall;
-                if (wad1.Name ?? wad1.FallbackNames[0]) {
-                    formattedDescription += ` (${wad1.Name ?? wad1.FallbackNames[0]})`;
-                }
-                formattedDescription += ` is ${aAn(wad1.Type)} ${wad1.Type}`;
-
-                if (wad1.Engines.length) {
-                    formattedDescription += ` for ${wad1.Engines.join(", ")}`;
-                }
-
-                if (wad1.Maps.length) {
-                    formattedDescription += ` featuring ${wad1.Maps.length} map${wad1.Maps.length === 1 ? '' : 's'} (${wad1.Maps.map(e => e.NiceNames?.LevelName ?? e.FallbackNiceNames[0]?.LevelName ?? e.Name).join(", ")})`;
-                }
-            }
-
-            formattedDescription = trimToLength(500, formattedDescription);
-
-            wad = wad1;
+            // @ts-expect-error Object.assign use
+            wad = wad1
 
             const params = $page.url.searchParams;
             if (params.has('id')) {
@@ -187,19 +156,19 @@
     <MetaTags
         title={wad.Title}
         titleTemplate="%s - Wad Archive"
-        description={wad.FormattedDescription}
+        description={wad.formattedDescription}
         canonical={wad.CanonicalFilename ? `${base}/wad?name=${wad.CanonicalFilename}` : `${base}/wad?id=${wad.IdSmall}`}
         openGraph={{
             type: 'website',
             title: `${wad.Title} - Wad Archive`,
-            description: wad.FormattedDescription,
+            description: wad.formattedDescription,
             images: [...wad.ogImages()],
             siteName: 'Wad Archive Mirror'
         }}
         twitter={{
             cardType: 'summary_large_image',
             title: `${wad.Title} - Wad Archive`,
-            description: wad.FormattedDescription,
+            description: wad.formattedDescription,
             image: wad.MainScreenshot ?? undefined,
             imageAlt: `Main screenshot for ${wad.Title}`
         }}
@@ -276,7 +245,7 @@
                         <img class="main-image" alt={wad.Title} src={wad.MainScreenshot} />
                     </div>
                 {/if}
-                {wad.FormattedDescription}
+                {wad.formattedDescription}
             </Col>
         </Row>
     </Container>
