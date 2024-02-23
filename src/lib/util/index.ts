@@ -55,11 +55,11 @@ export function convertValues<K extends string | number | symbol, V, RV>(object:
 //https://stackoverflow.com/a/66481918
 export function escapeHTML(unsafe: string) {
     return unsafe
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;')
     //.replace(
     //    // eslint-disable-next-line no-control-regex
     //    /[\u0000-\u002F\u003A-\u0040\u005B-\u0060\u007B-\u00FF]/g,

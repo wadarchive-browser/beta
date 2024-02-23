@@ -2,15 +2,13 @@
     import { page } from '$app/stores';
     import { Container, Row, Col, Icon, Card, Modal, Table, Button } from "@sveltestrap/sveltestrap";
     import { getCdnUrl, formatGraphicPath, formatMapScreenshot, formatPalettePath, formatWadDownloadPath, formatMapAutomap, formatEndoomPath } from "$lib/util/ia-url-formatter";
-    import type { PageData } from "./$types";
     import MapComponent from "$lib/components/MapComponent.svelte";
     import type { Endoom, Map, NiceNames, Wad, WadLumps, WadType } from "$lib/util/msgpack-models";
     import { queryLumpList, queryWad, queryWadByName } from "$lib/util/wad-lookup";
     import details from "$lib/images/details.png";
-    import { aAn, escapeHTML, humanizeFileSize, trimToLength } from "$lib/util";
+    import { escapeHTML, humanizeFileSize, trimToLength } from "$lib/util";
     import { redirect } from '@sveltejs/kit';
     import { onMount } from 'svelte';
-    import { never } from '../../util/promise';
     import MetaTags from 'svelte-meta-tags/MetaTags.svelte';
     import { Jumper } from "$lib/components/spinners";
     import { goto } from '$app/navigation';
