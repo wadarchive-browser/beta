@@ -1,8 +1,9 @@
+// @ts-check
+
 import adapter from '@sveltejs/adapter-static';
 import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 
-/** @satisfies {import('@sveltejs/kit').Config} */
-const config = {
+const config = /** @satisfies {import('@sveltejs/kit').Config} */ ({
 	// Consult https://kit.svelte.dev/docs/integrations#preprocessors
 	// for more information about preprocessors
 	preprocess: vitePreprocess(),
@@ -15,10 +16,15 @@ const config = {
 			fallback: '404.html'
 		}),
 
+		prerender: {
+			// @ts-ignore
+			entries: ['/index', '/index/digit', '*', ...'0123456789abcdefghijklmnopqrstuvwxyz'.split('').map(e => '/index/' + e)]
+		},
+
 		paths: {
 			base: '/beta'
 		},
 	}
-};
+});
 
 export default config;
