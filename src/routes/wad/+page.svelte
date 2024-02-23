@@ -21,17 +21,7 @@
 
     let modalMap: Map | undefined;
 
-    let wad: Wad & {
-        title: string,
-        mainScreenshot: string | null,
-        formattedDescription: string,
-        ogImages(): Generator<{
-            url: string;
-            alt?: string;
-            width?: number;
-            height?: number;
-        }>
-    };
+    let wad: Wad;
 
     let wadLumps: WadLumps | undefined;
 
@@ -92,28 +82,7 @@
 
             formattedDescription = trimToLength(500, formattedDescription);
 
-            wad = {
-                ...wad1,
-                title,
-                mainScreenshot,
-                formattedDescription,
-                *ogImages() {
-                    if (mainScreenshot) {
-                        yield {
-                            url: mainScreenshot,
-                            alt: title
-                        };
-                    }
-                    for (const map of wad1.Maps) {
-                        if (!map.Screenshot) continue;
-
-                        yield {
-                            url: formatMapScreenshot(wad1, map),
-                            alt: map.NiceNames?.LevelName ?? map.FallbackNiceNames[0]?.LevelName ?? map.Name
-                        };
-                    }
-                }
-            };
+            wad = wad1;
 
             const params = $page.url.searchParams;
             if (params.has('id')) {
@@ -216,27 +185,27 @@
     <Jumper size="60" color="var(--bs-code-color)" unit="px" duration="1.5s" />
 {:else}
     <MetaTags
-        title={wad.title}
+        title={wad.Title}
         titleTemplate="%s - Wad Archive"
-        description={wad.formattedDescription}
+        description={wad.FormattedDescription}
         canonical={wad.CanonicalFilename ? `${base}/wad?name=${wad.CanonicalFilename}` : `${base}/wad?id=${wad.IdSmall}`}
         openGraph={{
             type: 'website',
-            title: `${wad.title} - Wad Archive`,
-            description: wad.formattedDescription,
+            title: `${wad.Title} - Wad Archive`,
+            description: wad.FormattedDescription,
             images: [...wad.ogImages()],
             siteName: 'Wad Archive Mirror'
         }}
         twitter={{
             cardType: 'summary_large_image',
-            title: `${wad.title} - Wad Archive`,
-            description: wad.formattedDescription,
-            image: wad.mainScreenshot ?? undefined,
-            imageAlt: `Main screenshot for ${wad.title}`
+            title: `${wad.Title} - Wad Archive`,
+            description: wad.FormattedDescription,
+            image: wad.MainScreenshot ?? undefined,
+            imageAlt: `Main screenshot for ${wad.Title}`
         }}
     />
 
-    <h1>{wad.title}</h1>
+    <h1>{wad.Title}</h1>
 
     <Container>
         <Row>
@@ -302,19 +271,19 @@
                 {/if}
             </Col>
             <Col xs="4" style="text-align: center">
-                {#if wad.mainScreenshot}
+                {#if wad.MainScreenshot}
                     <div>
-                        <img class="main-image" alt={wad.title} src={wad.mainScreenshot} />
+                        <img class="main-image" alt={wad.Title} src={wad.MainScreenshot} />
                     </div>
                 {/if}
-                {wad.formattedDescription}
+                {wad.FormattedDescription}
             </Col>
         </Row>
     </Container>
 
     {#if wad.CanDownload}
         <h2>Download</h2>
-        <a rel="nofollow" href={formatWadDownloadPath(wad)}><Icon style="color: white" name="download" /> Download <em>{wad.title}</em> from Wad Archive (Internet Archive mirror)</a>
+        <a rel="nofollow" href={formatWadDownloadPath(wad)}><Icon style="color: white" name="download" /> Download <em>{wad.Title}</em> from Wad Archive (Internet Archive mirror)</a>
     {/if}
 
     {#if wad.Readmes.length}

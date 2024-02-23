@@ -1,3 +1,6 @@
+import { aAn } from '.';
+import { formatGraphicPath, formatMapScreenshot, getCdnUrl } from './ia-url-formatter';
+import lazy from './lazy';
 import { CustomConverter, MessagePackObject, key, array, type } from './msgpack-serializer';
 
 export const HexConverter = new CustomConverter<Uint8Array, string>(convertUint8ArrayToHex);
@@ -80,6 +83,84 @@ export class Wad extends MessagePackObject {
     @key(33) readonly LumpsInfoIndex!: [number, number] | null;
     @key(34) readonly CanonicalFilename!: string;
     @key(35) readonly IdSmall!: string;
+
+    @lazy
+    get Title() {
+        return this.Name
+            ?? this.FallbackNames[0]
+            ?? this.CanonicalFilename
+            ?? this.Filename
+            ?? this.Readmes.map(e => e.match(/^\btitle[ \t]*:[ \t]*(.*)$/im)?.[1]?.trim()).find(e => e != null)
+            ?? this.FallbackFilenames[0]
+            ?? this.IdSmall;
+    }
+
+    get IdealFilename() {
+        return this.CanonicalFilename
+            ?? this.Filename
+            ?? this.FallbackFilenames[0]
+            ?? this.IdSmall;
+    }
+
+    get IdealTitle() {
+        return this.Name
+            ?? this.FallbackNames[0]
+            ?? this.Readmes.map(e => e.match(/^\btitle[ \t]*:[ \t]*(.*)$/im)?.[1]?.trim()).find(e => e != null);
+    }
+
+    @lazy
+    get MainScreenshot() {
+        let mainScreenshot: string | null = null;
+
+        const titlepic = this.Graphics.find(e => e.Name == 'TITLE');
+        if (titlepic) mainScreenshot = formatGraphicPath(this, titlepic);
+        else if (this.Maps[0]?.Screenshot) mainScreenshot = formatMapScreenshot(this, this.Maps[0]);
+        else if (this.Graphics.length > 0) mainScreenshot = formatGraphicPath(this, this.Graphics[0]);
+
+        return mainScreenshot != null ? getCdnUrl(mainScreenshot) : undefined;
+    }
+
+    @lazy
+    get FormattedDescription() {
+        let formattedDescription: string;
+
+        if (this.Description ?? this.FallbackDescriptions?.[0]) {
+            formattedDescription = this.Description ?? this.FallbackDescriptions?.[0] ?? '';
+        } else {
+            formattedDescription = this.Filename ?? this.FallbackFilenames[0] ?? this.IdSmall;
+            if (this.Name ?? this.FallbackNames[0]) {
+                formattedDescription += ` (${this.Name ?? this.FallbackNames[0]})`;
+            }
+            formattedDescription += ` is ${aAn(this.Type)} ${this.Type}`;
+
+            if (this.Engines.length) {
+                formattedDescription += ` for ${this.Engines.join(', ')}`;
+            }
+
+            if (this.Maps.length) {
+                formattedDescription += ` featuring ${this.Maps.length} map${this.Maps.length === 1 ? '' : 's'} (${this.Maps.map(e => e.NiceNames?.LevelName ?? e.FallbackNiceNames[0]?.LevelName ?? e.Name).join(", ")})`;
+            }
+        }
+
+        return formattedDescription;
+    }
+
+    *ogImages() {
+        if (this.MainScreenshot) {
+            yield {
+                url: this.MainScreenshot,
+                alt: this.Title
+            };
+        }
+        for (const map of this.Maps) {
+            if (!map.Screenshot) continue;
+
+            yield {
+                url: formatMapScreenshot(this, map),
+                alt: map.NiceNames?.LevelName ?? map.FallbackNiceNames[0]?.LevelName ?? map.Name
+            };
+        }
+    }
 }
 
 export class Lump extends MessagePackObject {
@@ -98,27 +179,6 @@ export class WadLumps extends MessagePackObject {
     @key(1) readonly Count!: number;
     @key(2) readonly CorruptCount!: number;
     @key(3) @type(array(Lump)) readonly Lumps!: Lump[];
-}
-
-export const enum MapFormat {
-    DOOM = 'DOOM',
-    HEXEN = 'HEXEN',
-    DOOM64 = 'DOOM64',
-    TEXTMAP = 'TEXTMAP',
-}
-
-export const enum WadType {
-    IWAD = 'IWAD',
-    PWAD = 'PWAD',
-    ZWAD = 'ZWAD',
-    WAD2 = 'WAD2',
-    WAD3 = 'WAD3',
-    PK3 = 'PK3',
-    PK7 = 'PK7',
-    PKZ = 'PKZ',
-    EPK = 'EPK',
-    PKE = 'PKE',
-    UNKNOWN = 'UNKNOWN',
 }
 
 //! https://stackoverflow.com/a/34310051

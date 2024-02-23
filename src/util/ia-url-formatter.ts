@@ -1,6 +1,7 @@
 // https://archive.org/download/wadarchive/DATA/f1.zip/f1%2Fcb204c90119c4298c8a87933e90cfa91a02d34%2Ff1cb204c90119c4298c8a87933e90cfa91a02d34.wad.gz
 
-import { WadType, type Endoom, type Graphic, type Map, type Wad } from './msgpack-models';
+import { WadType } from './enums';
+import { type Endoom, type Graphic, type Map, type Wad } from './msgpack-models';
 
 // Input: f1cb204c90119c4298c8a87933e90cfa91a02d34/f1cb204c90119c4298c8a87933e90cfa91a02d34.wad.gz
 // Output: https://archive.org/download/wadarchive/DATA/f1.zip/f1%2Fcb204c90119c4298c8a87933e90cfa91a02d34%2Ff1cb204c90119c4298c8a87933e90cfa91a02d34.wad.gz
