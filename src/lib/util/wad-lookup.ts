@@ -23,7 +23,7 @@ const dbPromise = browser ? openDB<WadCacheDB>(`WadCache${base}`, 7, {
 
 const workerPromise = getWorker<{
     fetchAndDecompress(path: string): Promise<MsgpackDeserialized>
-}>(() => import('./zstd-thread?worker'));
+}>(() => import('../workers/zstd-thread?worker'));
 
 export async function fetchAndParseZstd(path: string, cache = true): Promise<MsgpackDeserialized> {
     if (!browser) {

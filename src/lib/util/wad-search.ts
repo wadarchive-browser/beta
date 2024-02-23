@@ -4,7 +4,7 @@ import type { SearchResult } from '../workers/search-thread';
 
 const workerPromise = getWorker<{
     searchWads(searchQuery: string, limit?: number): Promise<SearchResult>
-}>(() => import('./search-thread?worker'));
+}>(() => import('../workers/search-thread?worker'));
 
 export async function searchWads(searchQuery: string, limit = 1000): Promise<SearchResult> {
     if (!browser) {
