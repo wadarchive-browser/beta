@@ -1,4 +1,5 @@
 import { aAn } from '.';
+import type { MapFormat, WadType } from './enums';
 import { formatGraphicPath, formatMapScreenshot, getCdnUrl } from './ia-url-formatter';
 import lazy from './lazy';
 import { CustomConverter, MessagePackObject, key, array, type } from './msgpack-serializer';
