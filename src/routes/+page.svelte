@@ -34,10 +34,14 @@
     <p>
         Changelog:
         <ul>
-            <li>Feb 22, 2024 (part 2): Switch to short-form IDs + use WAD file names in URLs; old URLs will still work</li>
-            <li>Feb 22, 2024: Backend fixes, improved styles, added support for displaying lumps</li>
-            <li>Dec 7, 2023: Use wsrv.nl as CDN for serving images</li>
-            <li>Apr 10, 2023: Added search functionality</li>
-            <li>Apr 9, 2023: Initial release</li>
+            <li>
+                <b>Feb 23, 2024:</b> Added an alphabetical index of all WADs, make text search more accurate
+                (NB: The first search when you first load the page will be slower, as the index takes a few seconds to build. All following searches should be very fast.)
+            </li>
+            <li><b>Feb 22, 2024 (part 2):</b> Switch to short-form IDs + use WAD file names in URLs; old URLs will still work</li>
+            <li><b>Feb 22, 2024:</b> Backend fixes, improved styles, added support for displaying lumps</li>
+            <li><b>Dec 7, 2023:</b> Use wsrv.nl as CDN for serving images</li>
+            <li><b>Apr 10, 2023:</b> Added search functionality</li>
+            <li><b>Apr 9, 2023:</b> Initial release</li>
         </ul>
 </section>

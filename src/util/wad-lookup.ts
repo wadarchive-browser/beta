@@ -1,10 +1,18 @@
-import { Wad, WadLumps, convertUint8ArrayToHex } from './msgpack-models';
-import { openDB } from 'idb';
+import { Wad, WadLumps } from './msgpack-models';
+import { openDB, type DBSchema } from 'idb';
 import { browser } from '$app/environment';
-import { wrap } from 'comlink';
 import { base } from '$app/paths';
+import { getWorker } from './worker-helper';
 
-const dbPromise = browser ? openDB(`WadCache${base}`, 5, {
+export type MsgpackDeserialized = unknown;
+
+interface WadCacheDB extends DBSchema {
+    CachedData: {
+        key: string;
+        value: MsgpackDeserialized;
+    }
+}
+const dbPromise = browser ? openDB<WadCacheDB>(`WadCache${base}`, 7, {
     upgrade(database, oldVersion, newVersion, _transaction, _event) {
         if (database.objectStoreNames.contains('CachedData'))
             database.deleteObjectStore('CachedData');
@@ -13,17 +21,11 @@ const dbPromise = browser ? openDB(`WadCache${base}`, 5, {
     },
 }) : undefined;
 
-const workerPromise = browser ? (async () => {
-    // https://medium.com/geekculture/sveltekit-web-worker-8cfc0c86abf6
-    const { default: ZstdWorker } = await import('./zstd-thread?worker');
-    const worker = new ZstdWorker();
+const workerPromise = getWorker<{
+    fetchAndDecompress(path: string): Promise<MsgpackDeserialized>
+}>(() => import('./zstd-thread?worker'));
 
-    return wrap<{
-        fetchAndDecompress(path: string): Promise<unknown>
-    }>(worker);
-})() : undefined;
-
-export async function fetchAndParseZstd(path: string, cache = true): Promise<unknown> {
+export async function fetchAndParseZstd(path: string, cache = true): Promise<MsgpackDeserialized> {
     if (!browser) {
         throw new Error('This function should only be called in browser');
     }

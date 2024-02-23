@@ -1,11 +1,12 @@
 import { expose } from 'comlink';
 import Zstd from 'zstandard-wasm/speed';
 import { decode as msgpackDecode } from '../msgpack-javascript/src/index';
+import type { MsgpackDeserialized } from './wad-lookup';
 
 const zstdPromise = Zstd.loadWASM();
 
 expose({
-    async fetchAndDecompress(path: string) {
+    async fetchAndDecompress(path: string): Promise<MsgpackDeserialized> {
         await zstdPromise;
 
         const fetched = await fetch(path, {

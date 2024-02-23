@@ -182,6 +182,18 @@ export class WadLumps extends MessagePackObject {
     @key(3) @type(array(Lump)) readonly Lumps!: Lump[];
 }
 
+export class WadFuzzy extends MessagePackObject {
+    @key(0) @type(HexConverter) readonly Id!: string;
+    @key(1) @type(HexConverter) readonly Md5!: string;
+    @key(2) @type(HexConverter) readonly Sha256!: string;
+    @key(3) readonly Names!: string[];
+    @key(4) readonly Filenames!: string[];
+
+    get IdSmall() {
+        return this.Id.slice(0, 9);
+    }
+}
+
 //! https://stackoverflow.com/a/34310051
 export function convertUint8ArrayToHex(value: Uint8Array): string {
     const hexArray: string[] = new Array(value.length);

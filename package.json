@@ -33,6 +33,7 @@
 		"svelte-meta-tags": "^3.1.0",
 		"ts-node": "^10.9.2",
 		"tslib": "^2.6.2",
+		"type-fest": "^4.10.3",
 		"typescript": "^5.3.3",
 		"vite": "^5.1.4"
 	},
@@ -46,6 +47,8 @@
 		"comlink": "^4.4.1",
 		"fflate": "^0.8.2",
 		"idb": "^8.0.0",
+		"idb-lru-cache": "^1.0.0",
+		"minisearch": "^6.3.0",
 		"msgpack-lite": "^0.1.26",
 		"svelte-icons": "^2.1.0",
 		"zstandard-wasm": "1.5.0-rev.5"

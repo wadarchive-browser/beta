@@ -1,13 +1,12 @@
 <script lang="ts">
     import { Card, CardHeader, CardTitle, CardBody, CardSubtitle, CardText, Button, CardFooter } from "@sveltestrap/sveltestrap";
-    import { WadFuzzy, searchWads, type SearchResult } from "../../util/wad-search";
+    import { searchWads } from "../../util/wad-search";
     import { onDestroy, onMount } from "svelte";
     import { page } from "$app/stores";
     import { never } from "../../util/promise";
     import { Jumper } from "../../components/spinners";
-
-    let searchResults: Promise<SearchResult & { query: string }> = never;
-
+    import type { SearchResult } from "../../util/search-thread";
+    import type { WadFuzzy } from "../../util/msgpack-models";
     import { derived, writable } from 'svelte/store';
     import { base } from "$app/paths";
 
@@ -40,7 +39,10 @@
 
     onMount(() => {
         const unsub = q.subscribe(q => {
-            searchFor(q).then(e => results = e).catch(e => searchErr = e);
+            searchFor(q).then(e => results = e).catch(e => {
+                console.error(e);
+                searchErr = e;
+            });
         });
 
         return () => unsub();
@@ -99,19 +101,19 @@
                 <CardBody>
                     <CardText>
                         {#if result.Names.length > 1}
-                        Alternative titles: {result.Names.slice(1).join('; ')}<br>
+                            Alternative titles: {result.Names.slice(1).join('; ')}<br>
                         {/if}
                         {#if result.Filenames.length > 1}
-                        Alternative file names:
-                        {#each result.Filenames.slice(1) as filename, i}{i != 0 ? ";" : ""} <code>{filename}</code>{/each}<br>
+                            Alternative file names:
+                            {#each result.Filenames.slice(1) as filename, i}{i != 0 ? ";" : ""} <code>{filename}</code>{/each}<br>
                         {/if}
                         ID: <code>{result.IdSmall}</code><br>
                         SHA-1: <code>{result.Id}</code><br>
                         {#if result.Md5}
-                        MD5: <code>{result.Md5}</code><br>
+                            MD5: <code>{result.Md5}</code><br>
                         {/if}
                         {#if result.Sha256}
-                        SHA-256: <code>{result.Sha256}</code><br>
+                            SHA-256: <code>{result.Sha256}</code><br>
                         {/if}
                     </CardText>
                 </CardBody>

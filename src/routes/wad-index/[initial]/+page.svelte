@@ -1,9 +1,6 @@
 <script lang="ts">
     import { Card, CardHeader, CardTitle, CardBody, CardSubtitle, CardText, Button, CardFooter, Col, Image, Row } from "@sveltestrap/sveltestrap";
-    import { WadFuzzy, searchWads, type SearchResult } from "../../../util/wad-search";
-    import { onDestroy, onMount } from "svelte";
     import { page } from "$app/stores";
-    import { never } from "../../../util/promise";
     import { Jumper } from "../../../components/spinners";
     import { fetchAndParseZstd } from "../../../util/wad-lookup";
     import { base } from "$app/paths";

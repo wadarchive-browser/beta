@@ -1,14 +1,4 @@
 <script lang="ts">
-    import { Card, CardHeader, CardTitle, CardBody, CardSubtitle, CardText, Button, CardFooter } from "@sveltestrap/sveltestrap";
-    import { WadFuzzy, searchWads, type SearchResult } from "../../util/wad-search";
-    import { onDestroy, onMount } from "svelte";
-    import { page } from "$app/stores";
-    import { never } from "../../util/promise";
-    import { Jumper } from "../../components/spinners";
-
-    let searchResults: Promise<SearchResult & { query: string }> = never;
-
-    import { derived, writable } from 'svelte/store';
     import { base } from "$app/paths";
 
     const initials = '#0123456789abcdefghijklmnopqrstuvwxyz'.split('');
