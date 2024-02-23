@@ -3,6 +3,7 @@
     import { Button, Col, Form, FormGroup, Input, Label, Nav, NavItem, NavLink, Row } from "@sveltestrap/sveltestrap";
     import { goto } from "$app/navigation";
     import { onMount } from "svelte";
+    import { base } from "$app/paths";
 
     let searchTerm: string;
 
@@ -10,7 +11,7 @@
         if ($page.route.id === '/search') {
             searchTerm = $page.url.searchParams.get('q') ?? '';
         }
-    })
+    });
 </script>
 
 <style lang="scss">
@@ -45,10 +46,13 @@
 <header>
     <Nav>
         <NavItem>
-            <NavLink href="/">Home</NavLink>
+            <NavLink href="{base}/">Home</NavLink>
         </NavItem>
         <NavItem>
-            <Form on:submit={e => (e.preventDefault(), goto('/search?' + new URLSearchParams({q: searchTerm})))} inline>
+            <NavLink href="{base}/index">WAD Index</NavLink>
+        </NavItem>
+        <NavItem>
+            <Form on:submit={e => (e.preventDefault(), goto(`${base}/search?` + new URLSearchParams({q: searchTerm})))} inline>
                 <Row class="gx-1">
                     <Col class="search-col">
                         <Input
