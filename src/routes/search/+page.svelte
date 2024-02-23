@@ -9,6 +9,7 @@
     let searchResults: Promise<SearchResult & { query: string }> = never;
 
     import { derived, writable } from 'svelte/store';
+    import { base } from "$app/paths";
 
     const q = derived(page, e => e.url.searchParams.get('q'));
 
@@ -83,7 +84,7 @@
 {:else}
     <p>
         <b>Found {results.count} matches for "{results.query}" {#if results.count > 250}(displaying top 250 matches){/if}</b><br>
-        Not what you were looking for? Try <a href="/googlesearch?q={encodeURIComponent(results.query)}">searching with Google</a>
+        Not what you were looking for? Try <a href="{base}/googlesearch?q={encodeURIComponent(results.query)}">searching with Google</a>
     </p>
     {#each results.results as result}
         <a href="{base}/wad?id={result.IdSmall}" class="resultlink">
