@@ -4,7 +4,7 @@ import { browser } from '$app/environment';
 import { wrap } from 'comlink';
 import { base } from '$app/paths';
 
-const dbPromise = browser ? openDB('WadCache', 5, {
+const dbPromise = browser ? openDB(`WadCache${base}`, 5, {
     upgrade(database, oldVersion, newVersion, _transaction, _event) {
         if (database.objectStoreNames.contains('CachedData'))
             database.deleteObjectStore('CachedData');
