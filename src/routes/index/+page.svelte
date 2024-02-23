@@ -9,6 +9,7 @@
     let searchResults: Promise<SearchResult & { query: string }> = never;
 
     import { derived, writable } from 'svelte/store';
+    import { base } from "$app/paths";
 
     const initials = '#0123456789abcdefghijklmnopqrstuvwxyz'.split('');
 </script>
@@ -33,6 +34,6 @@
 
 <span style="word-wrap: break-word;">
 {#each initials as initial}
-    <a class="cum" href="/index/{initial === '#' ? 'digit' : initial}">{initial.toUpperCase()}</a>
+    <a class="cum" href="{base}/index/{initial === '#' ? 'digit' : initial}">{initial.toUpperCase()}</a>
 {/each}
 </span>
