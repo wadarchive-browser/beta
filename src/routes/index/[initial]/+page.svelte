@@ -50,7 +50,7 @@
 {:then wads}
     <Pagination rows={wads} perPage={50} totalShownPages={3} let:row>
         {@const wad = row}
-        <a href="/wad?id={wad.IdSmall}" class="resultlink">
+        <a href="{base}/wad?id={wad.IdSmall}" class="resultlink">
             <Card class="mb-3">
                 <Row>
                     <Col xs="3" class="thumb-col">

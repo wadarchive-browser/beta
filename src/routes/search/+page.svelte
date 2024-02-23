@@ -86,7 +86,7 @@
         Not what you were looking for? Try <a href="/googlesearch?q={encodeURIComponent(results.query)}">searching with Google</a>
     </p>
     {#each results.results as result}
-        <a href="/wad?id={result.IdSmall}" class="resultlink">
+        <a href="{base}/wad?id={result.IdSmall}" class="resultlink">
             <Card class="mb-3">
                 <CardHeader>
                     {#if result.Names[0]}
