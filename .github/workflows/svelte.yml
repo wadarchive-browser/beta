@@ -28,31 +28,38 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
+    env:
+      STORE_PATH: ''
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: recursive
       - name: Setup Pages
-        uses: actions/configure-pages@v3
-      
-      - uses: pnpm/action-setup@v2
+        uses: actions/configure-pages@v4
+
+      - uses: pnpm/action-setup@v3
         name: Install pnpm
         with:
           version: 8
-          run_install: true
+          run_install: false
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
+        name: Setup node
         with:
           node-version: latest
           cache: 'pnpm'
-      
+
+      - name: Install dependencies
+        run: pnpm install
+
       - run: npm run build
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
         with:
           # Upload entire repository
           path: './build'
+
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v2
+        uses: actions/deploy-pages@v3
