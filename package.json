@@ -10,9 +10,13 @@
 		"lint": "eslint ."
 	},
 	"devDependencies": {
+		"@babel/core": "^7.23.9",
+		"@babel/plugin-transform-block-scoping": "^7.23.4",
 		"@fontsource/fira-mono": "^5.0.8",
 		"@leeoniya/ufuzzy": "^1.0.14",
 		"@neoconfetti/svelte": "^2.2.1",
+		"@rollup/plugin-babel": "^6.0.4",
+		"@rollup/plugin-terser": "^0.4.4",
 		"@sveltejs/adapter-auto": "^3.1.1",
 		"@sveltejs/adapter-static": "^3.0.1",
 		"@sveltejs/kit": "^2.5.1",
@@ -36,6 +40,7 @@
 		"tslib": "^2.6.2",
 		"type-fest": "^4.10.3",
 		"typescript": "^5.3.3",
+		"unplugin-swc": "^1.4.4",
 		"vite": "^5.1.4"
 	},
 	"type": "module",

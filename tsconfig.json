@@ -13,7 +13,20 @@
 		"strict": true,
 		"experimentalDecorators": true, // ESBuild doesn't support TS 5.0 decorators
 		"useDefineForClassFields": false, // workaround our issue above where we can't set a field in a subclass from its superclass constructor and we don't have access to addInitializer from TS 5.0 decorators
-	}
+	},
+	"include": [
+		".svelte-kit/ambient.d.ts",
+		".svelte-kit/non-ambient.d.ts",
+		".svelte-kit/types/**/$types.d.ts",
+		"vite.config.js",
+		"vite.config.ts",
+		"src/**/*.js",
+		"src/**/*.ts",
+		"src/**/*.svelte",
+		"tests/**/*.js",
+		"tests/**/*.ts",
+		"tests/**/*.svelte"
+	],
 	// Path aliases are handled by https://kit.svelte.dev/docs/configuration#alias
 	//
 	// If you want to overwrite includes/excludes, make sure to copy over the relevant includes/excludes
