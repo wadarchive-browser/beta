@@ -65,7 +65,7 @@ export async function queryWad(id: string): Promise<Wad> {
 export async function queryLumpList(wad: Wad): Promise<WadLumps | undefined> {
     if (wad.LumpsInfoIndex == null) return undefined;
 
-    const decodedMessage = await fetchAndParseZstd(`${base}/lumps${wad.LumpsInfoIndex[0]}/${wad.LumpsInfoIndex[1]}.msg.zstd`, false) as Record<string, unknown[]>;
+    const decodedMessage = await fetchAndParseZstd(`/lumps${wad.LumpsInfoIndex[0]}/${wad.LumpsInfoIndex[1]}.msg.zstd`, false) as Record<string, unknown[]>;
 
     if (wad.Id in decodedMessage)
         return new WadLumps(decodedMessage[wad.Id]);
