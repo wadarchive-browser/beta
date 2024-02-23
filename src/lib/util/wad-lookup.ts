@@ -13,7 +13,7 @@ interface WadCacheDB extends DBSchema {
     }
 }
 const dbPromise = browser ? openDB<WadCacheDB>(`WadCache${base}`, 7, {
-    upgrade(database, oldVersion, newVersion, _transaction, _event) {
+    upgrade(database) {
         if (database.objectStoreNames.contains('CachedData'))
             database.deleteObjectStore('CachedData');
 

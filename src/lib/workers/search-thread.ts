@@ -1,8 +1,8 @@
-import { WadFuzzy } from './msgpack-models';
+import { WadFuzzy } from '../util/msgpack-models';
 
 import MiniSearch, { type AsPlainObject } from 'minisearch';
 
-import { fetchAndParseZstd } from './wad-lookup';
+import { fetchAndParseZstd } from '../util/wad-lookup';
 import { base } from '$app/paths';
 import { openDB, type DBSchema } from 'idb';
 import { expose } from 'comlink';

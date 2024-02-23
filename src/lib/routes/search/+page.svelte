@@ -1,13 +1,11 @@
 <script lang="ts">
     import { Card, CardHeader, CardTitle, CardBody, CardSubtitle, CardText, Button, CardFooter } from "@sveltestrap/sveltestrap";
-    import { searchWads } from "../../util/wad-search";
-    import { onDestroy, onMount } from "svelte";
+    import { searchWads } from "$lib/util/wad-search";
+    import { onMount } from "svelte";
     import { page } from "$app/stores";
-    import { never } from "../../util/promise";
-    import { Jumper } from "../../components/spinners";
-    import type { SearchResult } from "../../util/search-thread";
-    import type { WadFuzzy } from "../../util/msgpack-models";
-    import { derived, writable } from 'svelte/store';
+    import { Jumper } from "$lib/components/spinners";
+    import type { WadFuzzy } from "$lib/util/msgpack-models";
+    import { derived } from 'svelte/store';
     import { base } from "$app/paths";
 
     const q = derived(page, e => e.url.searchParams.get('q'));

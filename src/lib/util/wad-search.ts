@@ -1,6 +1,6 @@
 import { browser } from '$app/environment';
 import { getWorker } from './worker-helper';
-import type { SearchResult } from './search-thread';
+import type { SearchResult } from '../workers/search-thread';
 
 const workerPromise = getWorker<{
     searchWads(searchQuery: string, limit?: number): Promise<SearchResult>

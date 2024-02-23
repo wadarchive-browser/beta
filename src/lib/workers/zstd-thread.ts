@@ -1,7 +1,7 @@
 import { expose } from 'comlink';
 import Zstd from 'zstandard-wasm/speed';
-import { decode as msgpackDecode } from '../msgpack-javascript/src/index';
-import type { MsgpackDeserialized } from './wad-lookup';
+import { decode as msgpackDecode } from '../../msgpack-javascript/src/index';
+import type { MsgpackDeserialized } from '../util/wad-lookup';
 
 const zstdPromise = Zstd.loadWASM();
 

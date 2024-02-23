@@ -1,12 +1,12 @@
 <script lang="ts">
     import { Card, CardHeader, CardTitle, CardBody, CardSubtitle, CardText, Button, CardFooter, Col, Image, Row } from "@sveltestrap/sveltestrap";
     import { page } from "$app/stores";
-    import { Jumper } from "../../../components/spinners";
-    import { fetchAndParseZstd } from "../../../util/wad-lookup";
+    import { Jumper } from "$lib/components/spinners";
+    import { fetchAndParseZstd } from "$lib/util/wad-lookup";
     import { base } from "$app/paths";
-    import { Wad } from "../../../util/msgpack-models";
-    import Pagination from "../../../components/Pagination.svelte";
-    import { trimToLength } from "../../../util";
+    import { Wad } from "$lib/util/msgpack-models";
+    import Pagination from "$lib/components/Pagination.svelte";
+    import { trimToLength } from "$lib/util";
 
     const displayInitial = $page.params.initial === 'digit' ? '#' : $page.params.initial.toUpperCase();
 
