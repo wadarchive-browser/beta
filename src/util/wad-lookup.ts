@@ -2,6 +2,7 @@ import { Wad, WadLumps, convertUint8ArrayToHex } from './msgpack-models';
 import { openDB } from 'idb';
 import { browser } from '$app/environment';
 import { wrap } from 'comlink';
+import { base } from '$app/paths';
 
 const dbPromise = browser ? openDB('WadCache', 4, {
     upgrade(database, oldVersion, newVersion, _transaction, _event) {
@@ -56,7 +57,7 @@ export async function fetchAndParseZstd(path: string, cache = true): Promise<unk
 }
 
 export async function queryWad(id: string): Promise<Wad> {
-    const decodedMessage = await fetchAndParseZstd(`/wad-data/${id.slice(0, 3)}.msg.zstd`) as Record<string, unknown[]>;
+    const decodedMessage = await fetchAndParseZstd(`${base}/wad-data/${id.slice(0, 3)}.msg.zstd`) as Record<string, unknown[]>;
 
     return new Wad(decodedMessage[id]);
 }
@@ -64,7 +65,7 @@ export async function queryWad(id: string): Promise<Wad> {
 export async function queryLumpList(wad: Wad): Promise<WadLumps | undefined> {
     if (wad.LumpsInfoIndex == null) return undefined;
 
-    const decodedMessage = await fetchAndParseZstd(`/lumps${wad.LumpsInfoIndex[0]}/${wad.LumpsInfoIndex[1]}.msg.zstd`) as Record<string, unknown[]>;
+    const decodedMessage = await fetchAndParseZstd(`${base}/lumps${wad.LumpsInfoIndex[0]}/${wad.LumpsInfoIndex[1]}.msg.zstd`, false) as Record<string, unknown[]>;
 
     if (wad.Id in decodedMessage)
         return new WadLumps(decodedMessage[wad.Id]);
@@ -73,7 +74,7 @@ export async function queryLumpList(wad: Wad): Promise<WadLumps | undefined> {
 }
 
 export async function queryWadByName(name: string): Promise<Wad> {
-    const decodedMessage = await fetchAndParseZstd('/wadsByName.msg.zstd') as Record<string, string>;
+    const decodedMessage = await fetchAndParseZstd(`${base}/wadsByName.msg.zstd`) as Record<string, string>;
 
     return await queryWad(decodedMessage[name]);
 }
