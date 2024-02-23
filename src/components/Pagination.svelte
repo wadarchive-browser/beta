@@ -93,6 +93,7 @@ SOFTWARE.
         event.preventDefault();
         currentPage = Math.min(Math.max(page, 0), lastPage);
     }
+    /*
     function* range(from: number, to: number, mod = 1) {
         let i = from;
 
@@ -101,6 +102,7 @@ SOFTWARE.
             i += mod;
         }
     }
+    */
 </script>
 
 {#if totalRows && totalRows > perPage}
