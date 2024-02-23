@@ -17,8 +17,8 @@ const config = /** @satisfies {import('@sveltejs/kit').Config} */ ({
 		}),
 
 		prerender: {
-			// @ts-ignore
-			entries: ['/', '/wad-index', '/index/digit', '/search', '/googlesearch', '/wad', ...'0123456789abcdefghijklmnopqrstuvwxyz'.split('').map(e => '/index/' + e)]
+			// @ts-expect-error
+			entries: ['/', '/wad-index', '/wad-index/digit', '/search', '/googlesearch', '/wad', ...'0123456789abcdefghijklmnopqrstuvwxyz'.split('').map(e => '/index/' + e)]
 		},
 
 		paths: {
