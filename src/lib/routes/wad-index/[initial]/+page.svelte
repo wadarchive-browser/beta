@@ -55,11 +55,13 @@
                     </Col>
                     <Col>
                         <CardHeader>
-                            {#if wad.IdealTitle}
-                                <CardTitle>{wad.IdealTitle} ({wad.IdealFilename})</CardTitle>
-                            {:else}
-                                <CardTitle>{wad.IdealFilename}</CardTitle>
-                            {/if}
+                            <CardTitle>
+                                {#if wad.IdealTitle}
+                                    {wad.IdealTitle} ({wad.IdealFilename})
+                                {:else}
+                                    {wad.IdealFilename}
+                                {/if}
+                            </CardTitle>
                         </CardHeader>
                         <CardBody>
                             <CardText>
