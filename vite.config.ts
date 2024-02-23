@@ -23,7 +23,7 @@ export default defineConfig({
                 keep_infinity: true,
                 module: true,
                 unsafe: true,
-                toplevel: false,
+                toplevel: true,
                 unsafe_methods: true,
                 unsafe_proto: true,
                 unsafe_regexp: true,
@@ -41,7 +41,10 @@ export default defineConfig({
                 passes: 6,
             },
             sourceMap: true,
-            mangle: false
+            mangle: {
+                module: true,
+                toplevel: true,
+            }
         }
     }
 });
