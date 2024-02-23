@@ -14,9 +14,12 @@
 </script>
 
 <style>
-    .resultlink {
-        color: inherit;
+    .cum {
+        font-size: 350%;
         text-decoration: none;
+        width: 58px;
+        display: inline-block;
+        text-align: center;
     }
 </style>
 
@@ -28,6 +31,8 @@
 
 <!--<div class="gcse-search" />-->
 
+<span style="word-wrap: break-word;">
 {#each initials as initial}
-    <h2><a href="/index/{initial === '#' ? 'digit' : initial}">{initial.toUpperCase()}</a></h2>
+    <a class="cum" href="/index/{initial === '#' ? 'digit' : initial}">{initial.toUpperCase()}</a>
 {/each}
+</span>
